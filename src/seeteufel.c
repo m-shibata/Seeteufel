@@ -248,7 +248,7 @@ int eventLoopTCP()
     hints.ai_next = NULL;
 
     ret = getaddrinfo(NULL, PORT, &hints, &res);
-    if (s != 0) {
+    if (ret != 0) {
         syslog(LOG_ERR, "getaddrinfo() failed: %s\n", gai_strerror(ret));
         return -1;
     }
@@ -264,7 +264,7 @@ int eventLoopTCP()
             continue;
         }
 
-        if (listen(sock, 1) == -1) {
+        if (listen(sock[sock_id], 1) == -1) {
             close(sock[sock_id]);
             continue;
         }
@@ -294,7 +294,7 @@ int eventLoopTCP()
 
         for (i = 0; i < sock_id; i++) {
             if (FD_ISSET(sock[i], &rfds)) {
-                int fd = accept(sock, NULL, NULL);
+                int fd = accept(sock[i], NULL, NULL);
                 if (fd == -1) {
                     syslog(LOG_ERR, "listen() failed: %s\n", strerror(errno));
                     ret = -1;
