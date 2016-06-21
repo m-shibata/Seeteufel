@@ -192,6 +192,8 @@ enum event_id handle_event(int fd)
     if (recv_size == -1) {
         syslog(LOG_ERR, "read() failed: %s\n", strerror(errno));
         return EVENT_ERROR;
+    } else if (recv_size == 0) {
+        return EVENT_HANDLED;
     }
 
     buffer[recv_size] = '\0';
@@ -301,14 +303,17 @@ int eventLoopTCP()
                     goto finish;
                 }
 
-                enum event_id ev = handle_event(fd);
-                if (ev != EVENT_HANDLED) {
-                    close(fd);
-                    if (ev == EVENT_SHUTDOWN) {
-                        ret = 0;
-                        goto finish;
-                    } else if (ev == EVENT_DISCONNECT)
-                        break;
+                int loop_on = 1;
+                while (loop_on) {
+                    enum event_id ev = handle_event(fd);
+                    if (ev != EVENT_HANDLED) {
+                        if (ev == EVENT_SHUTDOWN) {
+                            ret = 0;
+                            close(fd);
+                            goto finish;
+                        } else if (ev == EVENT_DISCONNECT)
+                            loop_on = 0;
+                    }
                 }
 
                 if (close(fd) == -1) {
