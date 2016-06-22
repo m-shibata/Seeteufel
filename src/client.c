@@ -12,11 +12,27 @@
 #define BUF_SIZE 500
 #define PORT "51010"
 
+void print_gear(int gear_l, int gear_r)
+{
+    printf("GEAR: L=%4d R=%4d ", gear_l, gear_r);
+    if (gear_l == 0 && gear_r == 0) {
+        printf("(stop)\n");
+    } else if (gear_l == gear_r) {
+        if (gear_l > 0)
+            printf("(forward)\n");
+        else
+            printf("(back)\n");
+    } else if (gear_l > gear_r) {
+        printf("(right)\n");
+    } else {
+        printf("(left)\n");
+    }
+}
+
 void event_loop(int fd, int input)
 {
     char msg[BUF_SIZE];
     size_t len;
-    int i = 0;
 
     int loop_on = 1;
     int gear_l = 0, gear_r = 0;
@@ -43,7 +59,7 @@ void event_loop(int fd, int input)
                     new_gear = -(event.value / 3000) * 10;
                     if (event.number == 1) {
                         if (gear_l != new_gear) {
-                            printf("left %d\n", new_gear);
+                            print_gear(new_gear, gear_r);
                             snprintf(msg, BUF_SIZE -1, "left:%d", new_gear);
                             len = strnlen(msg, BUF_SIZE - 1);
                             msg[len] = '\0';
@@ -54,7 +70,7 @@ void event_loop(int fd, int input)
                         }
                     } else if (event.number == 5) {
                         if (gear_r != new_gear) {
-                            printf("left %d\n", new_gear);
+                            print_gear(gear_l, new_gear);
                             snprintf(msg, BUF_SIZE -1, "right:%d", new_gear);
                             len = strnlen(msg, BUF_SIZE - 1);
                             msg[len] = '\0';
@@ -75,59 +91,6 @@ void event_loop(int fd, int input)
     if (write(fd, msg, len) != len) {
         fprintf(stderr, "partial/failed write\n");
     }
-#if 0
-    while (i++ < 2) {
-        fprintf(stdout, "change:50,50\n");
-        snprintf(msg, BUF_SIZE -1, "change:50,50");
-        len = strnlen(msg, BUF_SIZE - 1);
-        msg[len] = '\0';
-        if (write(fd, msg, len) != len) {
-            fprintf(stderr, "partial/failed write\n");
-        }
-
-        sleep(2);
-
-        fprintf(stdout, "change:50,0\n");
-        snprintf(msg, BUF_SIZE -1, "change:50,0");
-        len = strnlen(msg, BUF_SIZE - 1);
-        msg[len] = '\0';
-        if (write(fd, msg, len) != len) {
-            fprintf(stderr, "partial/failed write\n");
-        }
-
-        sleep(2);
-
-        fprintf(stdout, "change:0,50\n");
-        snprintf(msg, BUF_SIZE -1, "change:0,50");
-        len = strnlen(msg, BUF_SIZE - 1);
-        msg[len] = '\0';
-        if (write(fd, msg, len) != len) {
-            fprintf(stderr, "partial/failed write\n");
-        }
-
-        sleep(2);
-
-        fprintf(stdout, "change:-50,-50\n");
-        snprintf(msg, BUF_SIZE -1, "change:-50,-50");
-        len = strnlen(msg, BUF_SIZE - 1);
-        msg[len] = '\0';
-        if (write(fd, msg, len) != len) {
-            fprintf(stderr, "partial/failed write\n");
-        }
-
-        sleep(2);
-
-        fprintf(stdout, "change:0,0\n");
-        snprintf(msg, BUF_SIZE -1, "change:0,0");
-        len = strnlen(msg, BUF_SIZE - 1);
-        msg[len] = '\0';
-        if (write(fd, msg, len) != len) {
-            fprintf(stderr, "partial/failed write\n");
-        }
-
-        sleep(2);
-    }
-#endif
 
     printf("disconnect\n");
     strncpy(msg, "disconnect", BUF_SIZE - 1);
@@ -143,19 +106,16 @@ int main(int argc, char *argv[])
     int input;
     struct addrinfo hints;
     struct addrinfo *result, *rp;
-    int sfd, s, j;
-    size_t len;
-    ssize_t nread;
-    char buf[BUF_SIZE];
+    int sfd, s;
 
-    if (argc < 2) {
-        fprintf(stderr, "Usage: %s host\n", argv[0]);
+    if (argc < 3) {
+        fprintf(stderr, "Usage: %s host inputdev\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
-    input = open("/dev/input/js0", O_RDONLY);
+    input = open(argv[2], O_RDONLY);
     if (input < 0) {
-        fprintf(stderr, "failed to open /dev/input/js0");
+        fprintf(stderr, "failed to open %s", argv[2]);
         exit(EXIT_FAILURE);
     }
 
