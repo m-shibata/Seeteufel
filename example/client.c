@@ -118,6 +118,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "failed to open %s", argv[2]);
         exit(EXIT_FAILURE);
     }
+    /* delete calibration data */
 
 
     memset(&hints, 0, sizeof(struct addrinfo));
