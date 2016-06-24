@@ -19,18 +19,18 @@ static void change_gear(int fd, int gear_l, int gear_r)
     size_t len;
     ssize_t ret;
 
-    printf("GEAR: L=%4d R=%4d ", gear_l, gear_r);
+    printf("\rGEAR: L=%4d R=%4d ", gear_l, gear_r);
     if (gear_l == 0 && gear_r == 0) {
-        printf("(stop)\n");
+        printf("%-10s\n", "(stop)");
     } else if (gear_l == gear_r) {
         if (gear_l > 0)
-            printf("(forward)\n");
+            printf("%-10s\n", "(forward)");
         else
-            printf("(back)\n");
+            printf("%-10s\n", "(back)");
     } else if (gear_l > gear_r) {
-        printf("(right)\n");
+        printf("%-10s\n", "(right)");
     } else {
-        printf("(left)\n");
+        printf("%-10s\n", "(left)");
     }
 
     snprintf(msg, BUF_SIZE -1, "change:%d,%d", gear_l, gear_r);
