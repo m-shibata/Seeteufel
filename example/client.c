@@ -171,10 +171,10 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
     if (strncmp(argv[2], "/dev/input/js", strlen("/dev/input/js"))) {
-        fprintf(stdout, "MODE: JoyStick\n");
+        fprintf(stdout, "MODE: Input Subsystem\n");
         is_joydev = 0;
     } else {
-        fprintf(stdout, "MODE: Input Subsystem\n");
+        fprintf(stdout, "MODE: JoyStick\n");
     }
 
     memset(&hints, 0, sizeof(struct addrinfo));
