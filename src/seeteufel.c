@@ -284,6 +284,7 @@ int eventLoopTCP()
         return -1;
     }
 
+    syslog(LOG_INFO, "connected\n");
     while (1) {
         ret = select(max_sock + 1, &rfds, NULL, NULL, NULL);
         if (ret < 0) {
