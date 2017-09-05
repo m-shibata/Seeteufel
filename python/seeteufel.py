@@ -14,9 +14,9 @@ class Seeteufel():
 
         try:
             pygame.display.init()
-            pygame.joystic.init()
+            pygame.joystick.init()
         except pygame.error:
-            raise SystemExit('Failed to initialize: {}'.format(pygame.get_error())
+            raise SystemExit('Failed to initialize: {}'.format(pygame.get_error()))
 
         js_count = pygame.joystick.get_count()
         if js_count == 0:
@@ -47,15 +47,17 @@ class Seeteufel():
         while done:
             power_on = self.rr.sw1_closed()
             if power_on:
-                self.clock.tick(1)
-            else
                 self.clock.tick(self.FPS)
+                #self.clock.tick(1)
+            else:
+                self.clock.tick(1)
+                continue
 
             updated_axis = False
             for event in pygame.event.get():
                 if event.type == JOYAXISMOTION:
-                    print 'AXIS: {}'.format(event)
-                    updated_axis = True
+                    if event.axis == 1 or event.axis == 5:
+                        updated_axis = True
                 elif event.type == JOYBUTTONUP:
                     if event.button == 0: # square
                         self.rr.set_led1(0)
@@ -82,10 +84,8 @@ class Seeteufel():
                 self.change_speed()
 
     def change_speed(self):
-            direction = { 'left':0, 'right':0 }
-            pace = { 'left':self.js.get_axis(1), 'right':self.js.get_axis(5) }
-            for k,v in pace:
-                if v < 0: direction[k] = 1
+            pace = { 'left':self.js.get_axis(5), 'right':self.js.get_axis(1) }
+            direction = { k:1 if v<0 else 0 for k,v in pace.iteritems() }
 
             self.rr.set_motors(abs(pace['left']), direction['left'],
                                 abs(pace['right']), direction['right'])
