@@ -54,7 +54,8 @@ class Seeteufel():
                 continue
 
             #updated_axis = False
-            for event in pygame.event.get():
+            events = pygame.event.get():
+            for event in events:
                 if event.type == JOYAXISMOTION:
                     if event.axis == 1 or event.axis == 5:
                         #updated_axis = True
