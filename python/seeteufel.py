@@ -53,11 +53,12 @@ class Seeteufel():
                 self.clock.tick(1)
                 continue
 
-            updated_axis = False
+            #updated_axis = False
             for event in pygame.event.get():
                 if event.type == JOYAXISMOTION:
                     if event.axis == 1 or event.axis == 5:
-                        updated_axis = True
+                        #updated_axis = True
+                        self.change_speed()
                 elif event.type == JOYBUTTONUP:
                     if event.button == 0: # square
                         self.rr.set_led1(0)
@@ -80,8 +81,8 @@ class Seeteufel():
                     self.rr.stop()
                     done = False
 
-            if updated_axis:
-                self.change_speed()
+            #if updated_axis:
+            #    self.change_speed()
 
     def change_speed(self):
             pace = { 'left':self.js.get_axis(5), 'right':self.js.get_axis(1) }
